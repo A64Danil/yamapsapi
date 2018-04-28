@@ -40,13 +40,14 @@ function vkInit() {
     });
 }
 
-function geocode(address) {
-    return ymaps.geocode(address).then(result => {
-        const points = result.geoObjects.toArray();
-
+function geocode(human) {
+    return ymaps.geocode(human.geo).then(result => {
+        points = result.geoObjects.toArray();
         if (points.length) {
-            return points[0].geometry.getCoordinates();
+            human.geo = points[0].geometry.getCoordinates();
         }
+
+        return human
     });
 }
 
@@ -57,18 +58,19 @@ var clusterer;
 
 new Promise(resolve => ymaps.ready(resolve))
     .then(() => vkInit())
-    .then(() => vkAPI('friends.get', { fields : 'city,country' }))
+    .then(() => vkAPI('friends.get', { fields : 'city,country,bdate,photo_100' }))
     .then(friends => {
+        console.log(friends);
         myMap = new ymaps.Map('map', {
             center: [55.76, 37.64],
-            zoom: 7
+            zoom: 8
         }, {
             searchControlProvider: 'yandex#search'
         });
         clusterer = new ymaps.Clusterer({
             preset: 'islands#invertedVioletClusterIcons',
             clusterDisableClickZoom: true,
-            openBalloonOnClick: false
+            openBalloonOnClick: true
         });
 
         myMap.geoObjects.add(clusterer);
@@ -77,23 +79,41 @@ new Promise(resolve => ymaps.ready(resolve))
     })
     .then(friends => {
         tmp = friends.filter(friend => friend.country && friend.country.title).map(friend => {
-                let parts = friend.country.title;
+                //let parts = friend.country.title;
+                let humans = {
+                    name: friend.first_name,
+                    secName: friend.last_name,
+                    geo: friend.country.title,
+                    photo: friend.photo_100,
+                    bdate: friend.bdate
+                };
                 if (friend.city) {
-                    parts += ' ' + friend.city.title;
+                    //parts += ' ' + friend.city.title;
+                    humans.geo += ' ' + friend.city.title;
                 }
 
-                return parts;
+                //console.log(humans);
+                return humans;
             })
         tmp2 = tmp.map(geocode);
         const promises = tmp2;
+        console.log(tmp2);
         return Promise.all(promises);
     })
-    .then(coords => {
-        console.log(coords);
-        const placemarks = coords.map(coord => {
-            return new ymaps.Placemark(coord, {}, { preset: 'islands#blueHomeCircleIcon'})
+    .then(humans => {
+        console.log(humans);
+        const placemarks = humans.map(human => {
+            return new ymaps.Placemark(human.geo, {
+                balloonContentHeader: human.name + ' ' + human.secName,
+                balloonContentBody: '<img src="' + human.photo + '">',
+                balloonContentFooter: 'Д.Р.: ' + human.bdate,
+                hintContent: 'Тут живет ' + human.name + ' ' + human.secName
+            }, {
+                preset: 'islands#blueHomeCircleIcon',
+                openBalloonOnClick: true
+            })
         })
-
+        console.log(placemarks);
         clusterer.add(placemarks);
     })
     .catch(e => console.log('Ошибка ' + e))
