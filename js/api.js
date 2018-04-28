@@ -31,12 +31,12 @@ function vkInit() {
         });
 
         VK.Auth.login(data => {
-            if (data.session) { console.log('auth ok');
-                resolve();
+            if (data.session) {
+                console.log('auth ok'); resolve();
             } else {
                 reject(new Error('Не удалось авторизоваться в ВК'));
             }
-            }, 4 | 8);
+            }, 4 | 8 );
     });
 }
 
@@ -50,13 +50,14 @@ function geocode(address) {
     });
 }
 
-
 var myMap;
+var tmp;
+var tmp2;
 var clusterer;
 
 new Promise(resolve => ymaps.ready(resolve))
     .then(() => vkInit())
-    .then(() => vkAPI('friends.get', { fields : 'city.county' }))
+    .then(() => vkAPI('friends.get', { fields : 'city,country' }))
     .then(friends => {
         myMap = new ymaps.Map('map', {
             center: [55.76, 37.64],
@@ -65,36 +66,34 @@ new Promise(resolve => ymaps.ready(resolve))
             searchControlProvider: 'yandex#search'
         });
         clusterer = new ymaps.Clusterer({
-            preset: 'islands#invertedClusterIcons',
+            preset: 'islands#invertedVioletClusterIcons',
             clusterDisableClickZoom: true,
-            openBlloonOnClick: false
-        })
+            openBalloonOnClick: false
+        });
 
-        myMap.getObjects.add(clusterer);
+        myMap.geoObjects.add(clusterer);
 
         return friends.items;
     })
     .then(friends => {
-        const promises = friends
-            .filter(friend => friend.country && friend.country.title)
-            .map(friend => {
+        tmp = friends.filter(friend => friend.country && friend.country.title).map(friend => {
                 let parts = friend.country.title;
-
                 if (friend.city) {
                     parts += ' ' + friend.city.title;
                 }
 
                 return parts;
             })
-            .map(string => geocode(string));
-
+        tmp2 = tmp.map(geocode);
+        const promises = tmp2;
         return Promise.all(promises);
     })
-    .then(coors => {
+    .then(coords => {
+        console.log(coords);
         const placemarks = coords.map(coord => {
             return new ymaps.Placemark(coord, {}, { preset: 'islands#blueHomeCircleIcon'})
         })
 
         clusterer.add(placemarks);
     })
-    //.catch(e => console.log('Ошибка ' + e))
+    .catch(e => console.log('Ошибка ' + e))

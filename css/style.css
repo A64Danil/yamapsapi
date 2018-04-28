@@ -1,3 +1,43 @@
-* {margin: 0; padding: 0;}
+* {margin: 0; padding: 0; font-family: Verdana, sans-serif;}
 
 body {font-size: 24px;}
+
+.main_title {position: absolute; width: 100%;     text-align: center;
+    z-index: 1;
+    font-size: 36px;
+    padding-top: 10px;
+    font-weight: bold;
+    background-color: rgba(255, 255, 255, 0.4);
+    transition: all 0.3s ease-in}
+
+.main_title:hover{ background-color: rgba(255, 255, 255, 0.85);}
+
+.main_title span {
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#cb60b3+0,c146a1+12,a80077+12,a80077+24,1100aa+24,1100aa+36,00b2af+36,00b2af+48,00b2af+48,00af08+48,00af08+60,deea00+60,deea00+72,fc0000+72,fc3f3f+84,39db36+84 */
+    background: #cb60b3; /* Old browsers */
+    background: -moz-linear-gradient(left, #cb60b3 0%, #c146a1 12%, #a80077 12%, #a80077 24%, #1100aa 24%, #1100aa 36%, #00b2af 36%, #00b2af 48%, #00b2af 48%, #00af08 48%, #00af08 60%, #deea00 60%, #deea00 72%, #fc0000 72%, #fc3f3f 84%, #39db36 84%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(left, #cb60b3 0%, #c146a1 12%, #a80077 12%, #a80077 24%, #1100aa 24%, #1100aa 36%, #00b2af 36%, #00b2af 48%, #00b2af 48%, #00af08 48%, #00af08 60%, #deea00 60%, #deea00 72%, #fc0000 72%, #fc3f3f 84%, #39db36 84%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to right, #cb60b3 0%, #c146a1 12%, #a80077 12%, #a80077 24%, #1100aa 24%, #1100aa 36%, #00b2af 36%, #00b2af 48%, #00b2af 48%, #00af08 48%, #00af08 60%, #deea00 60%, #deea00 72%, #fc0000 72%, #fc3f3f 84%, #39db36 84%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#cb60b3', endColorstr='#39db36', GradientType=1); /* IE6-9 */
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    transition: all 0.3s ease-in;
+    animation-duration: 1s;
+    animation-name: bgrainbow;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-play-state: paused;
+}
+
+.main_title:hover span{
+    animation-play-state: running;
+   }
+
+@keyframes bgrainbow {
+    0% {background-position: 0px 0;}
+    100% {background-position: 150px 0;}
+}
+
+#map {width: 100%;     height: 100vh;    min-height: 500px;
+    min-width: 100%;}
